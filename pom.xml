@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.confluent</groupId>
+        <artifactId>rest-utils-parent</artifactId>
+        <version>7.1.1</version>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>JSON-SR-compat</artifactId>
+    <version>1.0</version>
+
+    <properties>
+        <schemaRegistryUrl>http://localhost:8081</schemaRegistryUrl>
+        <schemaRegistryBasicAuthUserInfo></schemaRegistryBasicAuthUserInfo>
+        <test-topic-schema-v1>schemas/test-topic-schema-v1.json</test-topic-schema-v1>
+        <test-topic-schema-age-removed>schemas/test-topic-schema-age-removed.json</test-topic-schema-age-removed>
+        <confluent.version>7.6.2</confluent.version>
+        <checkstyle.skip>true</checkstyle.skip>
+    </properties>
+
+    <repositories>
+      <repository>
+        <id>confluent</id>
+        <name>Confluent</name>
+        <url>https://packages.confluent.io/maven/</url>
+      </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.confluent</groupId>
+                <artifactId>kafka-schema-registry-maven-plugin</artifactId>
+                <version>${confluent.version}</version>
+                <configuration>
+                    <schemas>
+                        <test-topic-value>schemas/test-topic-schema-job-added.json</test-topic-value>
+                    </schemas>
+                    <previousSchemaPaths>
+                        <test-topic-value>schemas/test-topic-schema-v1.json</test-topic-value>
+                    </previousSchemaPaths>
+                     <compatibilityLevels>
+                        <test-topic-value>BACKWARD</test-topic-value>
+                    </compatibilityLevels>                   
+                    <schemaRegistryUrls>
+                        <param>${schemaRegistryUrl}</param>
+                    </schemaRegistryUrls>
+                    <!--userInfoConfig>${schemaRegistryBasicAuthUserInfo}</userInfoConfig-->
+                    <subjects>
+                        <test-topic-value>${test-topic-schema-age-removed}</test-topic-value>
+                    </subjects>
+                    <schemaTypes>
+                        <test-topic-value>JSON</test-topic-value>
+                    </schemaTypes>
+                    <verbose>true</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>test-local-compatibility</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>test-local-compatibility</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>
